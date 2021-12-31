@@ -30,7 +30,7 @@ PoolStringArray Qodot::get_texture_list() {
 void Qodot::set_entity_definitions(Dictionary p_entity_defs) {
 	for (int i = 0; i < p_entity_defs.size(); i++) {
 		String key = p_entity_defs.get_key_at_index(i);
-		int64_t value = p_entity_defs.get_value_at_index(i);
+		int value = p_entity_defs.get_value_at_index(i).get("spawn_type");
 		CharString key_cs = key.utf8();
 		map_parser.map_data->map_data_set_spawn_type_by_classname(key_cs, (ENTITY_SPAWN_TYPE)value);
 	}
