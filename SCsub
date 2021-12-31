@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+
+Import("env")
+Import("env_modules")
+
+module_path = Dir('.').srcnode().abspath
+
+thirdparty_obj = []
+
+thirdparty_dir = "%s/thirdparty/libmap_next/src/" % module_path
+thirdparty_sources = [
+    "geo_generator.cpp",
+    "map_data.cpp",
+    "map_parser.cpp",
+    "matrix.cpp",
+    "surface_gatherer.cpp",
+    "vector.cpp"
+]
+
+thirdparty_sources = [thirdparty_dir + file for file in thirdparty_sources]
+
+env_qodot = env_modules.Clone()
+
+env_qodot.Prepend(CPPPATH=[thirdparty_dir])
+
+env_thirdparty = env_qodot.Clone()
+env_thirdparty.add_source_files(thirdparty_obj, thirdparty_sources)
+env.modules_sources += thirdparty_obj
+
+
+module_obj = []
+
+
+module_files = [
+    "qodot.cpp",
+    "register_types.cpp"
+]
+
+env_qodot.add_source_files(module_obj, "*.cpp")
+env.modules_sources += module_obj
+
+env.Depends(module_obj, thirdparty_obj)
