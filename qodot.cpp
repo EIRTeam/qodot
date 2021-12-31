@@ -261,7 +261,7 @@ Array Qodot::fetch_surfaces(double p_inverse_scale_factor) {
 		PoolVector3Array normals;
 
 		for (int v = 0; v < surf->vertex_count; ++v) {
-			gv3 = Vector3(surf->vertices[v].vertex.y, surf->vertices[v].vertex.z, surf->vertices[v].vertex.x);
+			gv3 = Vector3(surf->vertices[v].normal.y, surf->vertices[v].normal.z, surf->vertices[v].normal.x);
 			normals.append(gv3);
 		}
 
