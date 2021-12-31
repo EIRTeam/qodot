@@ -4,6 +4,7 @@
 #include "map_data.h"
 #include "map_parser.h"
 #include "surface_gatherer.h"
+#include "scene/resources/mesh.h"
 
 void Qodot::load_map(const String &map_file_str) {
 	CharString map_file = map_file_str.utf8();
@@ -293,22 +294,14 @@ Array Qodot::fetch_surfaces(double p_inverse_scale_factor) {
 
 		Array brush_array;
 
-		brush_array.append(Variant(vertices)); // ARRAY_VERTEX
-		brush_array.append(Variant(normals)); // ARRAY_NORMAL
-		brush_array.append(Variant(tangents)); // ARRAY_TANGENT
-		brush_array.append(v_nil); // ARRAY_COLOR
-		brush_array.append(Variant(uvs)); // ARRAY_TEX_UV
-		brush_array.append(v_nil); // ARRAY_TEX_UV2
-		// Uncomment these for 4.0 support
-		/*
-		brush_array.append(v_nil); //ARRAY_CUSTOM0
-		brush_array.append(v_nil); //ARRAY_CUSTOM1
-		brush_array.append(v_nil); //ARRAY_CUSTOM2
-		brush_array.append(v_nil); //ARRAY_CUSTOM3
-		*/
-		brush_array.append(v_nil); // ARRAY_BONES
-		brush_array.append(v_nil); // ARRAY_WEIGHTS
-		brush_array.append(Variant(indices));
+		brush_array.resize(Mesh::ArrayType::ARRAY_MAX);
+		brush_array.fill(v_nil);
+
+		brush_array[Mesh::ArrayType::ARRAY_VERTEX] = Variant(vertices);
+		brush_array[Mesh::ArrayType::ARRAY_NORMAL] = Variant(normals);
+		brush_array[Mesh::ArrayType::ARRAY_TANGENT] = Variant(tangents);
+		brush_array[Mesh::ArrayType::ARRAY_TEX_UV] = Variant(uvs);
+		brush_array[Mesh::ArrayType::ARRAY_INDEX] = Variant(indices);
 
 		surf_array.append(brush_array);
 	}
