@@ -7,7 +7,7 @@ module_path = Dir('.').srcnode().abspath
 
 thirdparty_obj = []
 
-thirdparty_dir = "%s/thirdparty/libmap_next/src/" % module_path
+thirdparty_dir = "%s/thirdparty/libmap_cpp/src/" % module_path
 thirdparty_sources = [
     "geo_generator.cpp",
     "map_data.cpp",
