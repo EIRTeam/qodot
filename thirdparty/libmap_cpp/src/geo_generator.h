@@ -3,8 +3,8 @@
 
 #include "brush.h"
 #include "libmap.h"
-#include "map_data.h"
 #include "vector.h"
+#include "map_data.h"
 #include <memory>
 
 class LMGeoGenerator {
