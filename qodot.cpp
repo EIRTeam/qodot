@@ -11,8 +11,8 @@ void Qodot::load_map(const String &map_file_str) {
 	map_parser.map_parser_load(map_file);
 }
 
-PoolStringArray Qodot::get_texture_list() {
-	PoolStringArray g_textures;
+PackedStringArray Qodot::get_texture_list() {
+	PackedStringArray g_textures;
 	int tex_count = map_data->map_data_get_texture_count();
 	LMTextureData *textures = map_data->map_data_get_textures();
 
@@ -87,7 +87,7 @@ Array Qodot::get_entity_dicts() {
 		entity_dict["brush_count"] = ent->brush_count;
 
 		// Brush indices
-		PoolIntArray brush_indices;
+		PackedInt64Array brush_indices;
 
 		for (int b = 0; b < ent->brush_count; b++) {
 			const LMBrush *brush = &ent->brushes[b];
@@ -150,7 +150,7 @@ Array Qodot::get_worldspawn_layer_dicts() {
 
 		layer_dict["texture"] = String::utf8(tex_data->name);
 
-		PoolIntArray brush_indices;
+		PackedInt64Array brush_indices;
 
 		for (int b = 0; b < worldspawn_entity->brush_count; ++b) {
 			const LMBrush *brush = &worldspawn_entity->brushes[b];
@@ -250,7 +250,7 @@ Array Qodot::fetch_surfaces(double p_inverse_scale_factor) {
 
 		// Create vertex array
 
-		PoolVector3Array vertices;
+		PackedVector3Array vertices;
 
 		for (int v = 0; v < surf->vertex_count; ++v) {
 			gv3 = Vector3(surf->vertices[v].vertex.y, surf->vertices[v].vertex.z, surf->vertices[v].vertex.x);
@@ -259,7 +259,7 @@ Array Qodot::fetch_surfaces(double p_inverse_scale_factor) {
 		}
 
 		// Create normal array
-		PoolVector3Array normals;
+		PackedVector3Array normals;
 
 		for (int v = 0; v < surf->vertex_count; ++v) {
 			gv3 = Vector3(surf->vertices[v].normal.y, surf->vertices[v].normal.z, surf->vertices[v].normal.x);
@@ -267,7 +267,7 @@ Array Qodot::fetch_surfaces(double p_inverse_scale_factor) {
 		}
 
 		// Create tangent array
-		PoolRealArray tangents;
+		PackedFloat64Array tangents;
 
 		for (int v = 0; v < surf->vertex_count; v++) {
 			tangents.append(surf->vertices[v].tangent.y);
@@ -277,7 +277,7 @@ Array Qodot::fetch_surfaces(double p_inverse_scale_factor) {
 		}
 
 		// Create UV array
-		PoolVector2Array uvs;
+		PackedVector2Array uvs;
 
 		for (int v = 0; v < surf->vertex_count; v++) {
 			gv2 = Vector2(surf->vertices[v].uv.u, surf->vertices[v].uv.v);
@@ -286,7 +286,7 @@ Array Qodot::fetch_surfaces(double p_inverse_scale_factor) {
 
 		// Create indices array
 
-		PoolIntArray indices;
+		PackedInt32Array indices;
 
 		for (int i = 0; i < surf->index_count; i++) {
 			indices.append(surf->indices[i]);

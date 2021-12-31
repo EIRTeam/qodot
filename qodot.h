@@ -1,14 +1,14 @@
 #ifndef QODOT_H
 #define QODOT_H
-#include "core/dictionary.h"
-#include "core/reference.h"
-#include "core/ustring.h"
+#include "core/variant/dictionary.h"
+#include "core/object/ref_counted.h"
+#include "core/string/ustring.h"
 #include "geo_generator.h"
 #include "map_parser.h"
 #include "surface_gatherer.h"
 
-class Qodot : public Reference {
-	GDCLASS(Qodot, Reference);
+class Qodot : public RefCounted {
+	GDCLASS(Qodot, RefCounted);
 	std::shared_ptr<LMMapData> map_data = std::make_shared<LMMapData>();
 	LMMapParser map_parser = LMMapParser(map_data);
 	LMGeoGenerator geo_generator = LMGeoGenerator(map_data);
@@ -16,7 +16,7 @@ class Qodot : public Reference {
 
 public:
 	void load_map(const String &map_file_str);
-	PoolStringArray get_texture_list();
+	PackedStringArray get_texture_list();
 	void set_entity_definitions(Dictionary p_entity_defs);
 	void set_worldspawn_layers(Array p_worldspawn_layers);
 	void generate_geometry(Dictionary p_texture_dict);
