@@ -14,6 +14,8 @@ typedef struct LMSurface {
 	LMFaceVertex *vertices = NULL;
 	int index_count = 0;
 	int *indices = NULL;
+	int vertex_color_count = 0;
+	vertexColor *vertex_colors = NULL;
 } LMSurface;
 
 typedef struct LMSurfaces {

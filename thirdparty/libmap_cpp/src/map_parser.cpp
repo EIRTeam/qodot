@@ -17,12 +17,22 @@ void LMMapParser::reset_current_face() {
 	current_face = (face){ 0 };
 }
 
+void LMMapParser::reset_current_vertex_color() {
+	current_vertex_color = (vertexColor){ 0 };	
+}
+
 void LMMapParser::reset_current_brush() {
 	if (current_brush.faces != NULL) {
 		free(current_brush.faces);
 		current_brush.faces = NULL;
 	}
 
+	if (current_brush.vertex_colors != NULL) {
+		free(current_brush.vertex_colors);
+		current_brush.vertex_colors = NULL;
+	}
+
+	current_brush.vertex_color_count = 0;
 	current_brush.face_count = 0;
 }
 
@@ -31,6 +41,8 @@ void LMMapParser::reset_current_entity() {
 		if (current_entity.brushes[i].faces != NULL) {
 			free(current_entity.brushes[i].faces);
 			current_entity.brushes[i].faces = NULL;
+			free(current_entity.brushes[i].vertex_colors);
+			current_entity.brushes[i].vertex_colors = NULL;
 		}
 	}
 
@@ -63,6 +75,7 @@ bool LMMapParser::map_parser_load(const char *map_file) {
 	map_data->map_data_reset();
 
 	reset_current_face();
+	reset_current_vertex_color();
 	reset_current_brush();
 	reset_current_entity();
 
@@ -144,6 +157,10 @@ void LMMapParser::set_scope(PARSE_SCOPE new_scope) {
 		case PS_VALVE_V:
 			puts("Switching to Valve V scope\n");
 			break;
+		case PS_EIRTEAM_COLOR_POS:
+			puts("Switching to EIRTeam vertex color position scope\n");
+		case PS_EIRTEAM_COLOR:
+			puts("Switching to EIRTeam vertex color scope\n");
 		case PS_ROT:
 			puts("Switching to rotation scope\n");
 			break;
@@ -252,6 +269,9 @@ void LMMapParser::token(const char *buf) {
 				face_idx++;
 				component_idx = 0;
 				set_scope(PS_PLANE_0);
+			} else if (strings_match(buf, "[")) {
+				component_idx = 0;
+				set_scope(PS_EIRTEAM_COLOR_POS);
 			} else if (strings_match(buf, "}")) {
 				commit_brush();
 				set_scope(PS_ENTITY);
@@ -347,6 +367,58 @@ void LMMapParser::token(const char *buf) {
 		case PS_V: {
 			current_face.uv_standard.v = atof(buf);
 			set_scope(PS_ROT);
+			break;
+		}
+		case PS_EIRTEAM_COLOR_POS: {
+			if (strings_match(buf, "]")) {
+				component_idx = 0;
+				set_scope(PS_EIRTEAM_COLOR);
+			} else {
+				switch (component_idx) {
+					case 0:
+						current_vertex_color.position.x = atof(buf);
+						break;
+					case 1:
+						current_vertex_color.position.y = atof(buf);
+						break;
+					case 2:
+						current_vertex_color.position.z = atof(buf);
+						break;
+					default:
+						break;
+				}
+
+				component_idx++;
+			}
+			break;
+		}
+		case PS_EIRTEAM_COLOR: {
+			if (strings_match(buf, "[")) {
+				break;
+			} else if (strings_match(buf, "]")) {
+				component_idx = 0;
+				commit_vertex_color();
+				set_scope(PS_BRUSH);
+			} else {
+				switch (component_idx) {
+					case 0:
+						current_vertex_color.vColor.r = atof(buf);
+						break;
+					case 1:
+						current_vertex_color.vColor.g = atof(buf);
+						break;
+					case 2:
+						current_vertex_color.vColor.b = atof(buf);
+						break;
+					case 3:
+						current_vertex_color.vColor.a = atof(buf);
+						break;
+					default:
+						break;
+				}
+
+				component_idx++;
+			}
 			break;
 		}
 		case PS_VALVE_U: {
@@ -445,6 +517,13 @@ void LMMapParser::commit_face() {
 	reset_current_face();
 }
 
+void LMMapParser::commit_vertex_color() {
+	current_brush.vertex_color_count++;
+	current_brush.vertex_colors = (vertexColor *)realloc(current_brush.vertex_colors, current_brush.vertex_color_count * sizeof(vertexColor));
+	current_brush.vertex_colors[current_brush.vertex_color_count - 1] = current_vertex_color;
+	reset_current_vertex_color();
+}
+
 void LMMapParser::commit_brush() {
 	current_entity.brush_count++;
 	current_entity.brushes = (LMBrush *)realloc(current_entity.brushes, current_entity.brush_count * sizeof(LMBrush));
@@ -456,6 +535,12 @@ void LMMapParser::commit_brush() {
 	dest_brush->faces = (LMFace *)realloc(dest_brush->faces, dest_brush->face_count * sizeof(LMFace));
 	for (int i = 0; i < dest_brush->face_count; ++i) {
 		dest_brush->faces[i] = current_brush.faces[i];
+	}
+
+	dest_brush->vertex_color_count = current_brush.vertex_color_count;
+	dest_brush->vertex_colors = (vertexColor *)realloc(dest_brush->vertex_colors, dest_brush->vertex_color_count * sizeof(vertexColor));
+	for (int i = 0; i < dest_brush->vertex_color_count; ++i) {
+		dest_brush->vertex_colors[i] = current_brush.vertex_colors[i];
 	}
 
 	reset_current_brush();
@@ -489,6 +574,12 @@ void LMMapParser::commit_entity() {
 		dest_brush->faces = (LMFace *)realloc(dest_brush->faces, dest_brush->face_count * sizeof(LMFace));
 		for (int f = 0; f < dest_brush->face_count; ++f) {
 			dest_brush->faces[f] = current_entity.brushes[b].faces[f];
+		}
+
+		dest_brush->vertex_color_count = current_entity.brushes[b].vertex_color_count;
+		dest_brush->vertex_colors = (vertexColor *)realloc(dest_brush->vertex_colors, dest_brush->vertex_color_count * sizeof(vertexColor));
+		for (int i = 0; i < dest_brush->vertex_color_count; ++i) {
+			dest_brush->vertex_colors[i] = current_entity.brushes[b].vertex_colors[i];
 		}
 	}
 

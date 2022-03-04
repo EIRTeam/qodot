@@ -116,6 +116,11 @@ void LMSurfaceGatherer::surface_gatherer_reset_state() {
 			free(surf->indices);
 			surf->indices = NULL;
 		}
+
+		if (surf->vertex_colors != NULL) {
+			free(surf->vertex_colors);
+			surf->vertex_colors = NULL;
+		}
 	}
 
 	if (out_surfaces.surfaces != NULL) {
@@ -167,6 +172,15 @@ void LMSurfaceGatherer::surface_gatherer_run() {
 			if (split_type == SST_BRUSH) {
 				index_offset = 0;
 				surf_inst = surface_gatherer_add_surface();
+			}
+
+			
+			int vertex_color_write_offset = surf_inst->vertex_color_count;
+			surf_inst->vertex_color_count = surf_inst->vertex_color_count + brush_inst->vertex_color_count;
+			surf_inst->vertex_colors = (vertexColor *)realloc(surf_inst->vertex_colors, surf_inst->vertex_color_count * sizeof(vertexColor));;
+
+			for (int i = 0; i < brush_inst->vertex_color_count; i++) {
+				surf_inst->vertex_colors[vertex_color_write_offset + i] = brush_inst->vertex_colors[i];
 			}
 
 			for (int f = 0; f < brush_inst->face_count; ++f) {

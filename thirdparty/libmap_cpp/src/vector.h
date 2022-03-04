@@ -6,6 +6,17 @@ struct vec3 {
 	double z;
 };
 
+struct color {
+	double r;
+	double g;
+	double b;
+	double a;
+};
+struct vertexColor {
+	vec3 position;
+	color vColor;
+};
+
 bool vec3_equals(vec3 lhs, vec3 rhs);
 vec3 vec3_add(vec3 lhs, vec3 rhs);
 vec3 vec3_sub(vec3 lhs, vec3 rhs);

@@ -22,6 +22,8 @@ typedef enum PARSE_SCOPE {
 	PS_V,
 	PS_VALVE_U,
 	PS_VALVE_V,
+	PS_EIRTEAM_COLOR_POS,
+	PS_EIRTEAM_COLOR,
 	PS_ROT,
 	PS_U_SCALE,
 	PS_V_SCALE,
@@ -41,6 +43,7 @@ private:
 	LMFace current_face;
 	LMBrush current_brush;
 	LMEntity current_entity;
+	vertexColor current_vertex_color;
 	bool strings_match(const char *lhs, const char *rhs);
 
 public:
@@ -53,6 +56,7 @@ public:
 	void commit_face();
 	void commit_brush();
 	void commit_entity();
+	void commit_vertex_color();
 	LMMapParser(std::shared_ptr<LMMapData> _map_data) :
 			map_data(_map_data){};
 
@@ -60,6 +64,7 @@ private:
 	void reset_current_face();
 	void reset_current_entity();
 	void reset_current_brush();
+	void reset_current_vertex_color();
 	void set_scope(PARSE_SCOPE new_scope);
 };
 

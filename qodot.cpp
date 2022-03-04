@@ -5,6 +5,7 @@
 #include "map_parser.h"
 #include "surface_gatherer.h"
 #include "scene/resources/mesh.h"
+#include "core/math/color.h"
 
 void Qodot::load_map(const String &map_file_str) {
 	CharString map_file = map_file_str.utf8();
@@ -248,14 +249,26 @@ Array Qodot::fetch_surfaces(double p_inverse_scale_factor) {
 			continue;
 		}
 
-		// Create vertex array
+		Dictionary colorMap;
+
+		for (int i = 0; i < surf->vertex_color_count; i++) {
+			vertexColor vertex_color =  surf->vertex_colors[i];
+			Vector3 pos = Vector3(vertex_color.position.x, vertex_color.position.y, vertex_color.position.z);
+			colorMap[pos] = Color(vertex_color.vColor.r, vertex_color.vColor.g, vertex_color.vColor.b, vertex_color.vColor.a);
+		}
+
+		// Create vertex & color array
 
 		PackedVector3Array vertices;
+		PackedColorArray colors;
 
 		for (int v = 0; v < surf->vertex_count; ++v) {
 			gv3 = Vector3(surf->vertices[v].vertex.y, surf->vertices[v].vertex.z, surf->vertices[v].vertex.x);
+			Vector3 vertexQuake = Vector3(surf->vertices[v].vertex.x, surf->vertices[v].vertex.y, surf->vertices[v].vertex.z);
+			Color col = colorMap.get(vertexQuake, Color(1.0f, 1.0f, 1.0f, 1.0f));
 			gv3 = gv3 / p_inverse_scale_factor;
 			vertices.append(gv3);
+			colors.append(col);
 		}
 
 		// Create normal array
@@ -298,6 +311,7 @@ Array Qodot::fetch_surfaces(double p_inverse_scale_factor) {
 		brush_array.fill(v_nil);
 
 		brush_array[Mesh::ArrayType::ARRAY_VERTEX] = Variant(vertices);
+		brush_array[Mesh::ArrayType::ARRAY_COLOR] = Variant(colors);
 		brush_array[Mesh::ArrayType::ARRAY_NORMAL] = Variant(normals);
 		brush_array[Mesh::ArrayType::ARRAY_TANGENT] = Variant(tangents);
 		brush_array[Mesh::ArrayType::ARRAY_TEX_UV] = Variant(uvs);
